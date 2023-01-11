@@ -33,6 +33,8 @@ class mString{
     
     friend bool operator>(const mString &s1,const mString &s2);
     friend bool operator>=(const mString &s1,const mString &s2);
+    friend bool operator<(const mString &s1,const mString &s2);
+    friend bool operator<=(const mString &s1,const mString &s2);
     friend bool operator==(const mString &s1,const mString &s2);
     friend bool operator!=(const mString &s1,const mString &s2);
     
@@ -191,6 +193,14 @@ bool operator>(const mString &s1,const mString &s2){
     }
     return 0;
 }
+bool operator<=(const mString &s1, const mString &s2){
+    bool pr = (s1>s2);
+    return !pr;
+}
+bool operator<(const mString &s1, const mString &s2){
+    bool pr = (s1>=s2);
+    return !pr;
+}
  
 
 int mString::length(){
@@ -225,13 +235,13 @@ class Tpeep{
     mString surname,name,otch,dr;
     int state;
     public:
-    void create(const mString &sur, const mString &na,const mString &ot,const mString &d){
+    virtual void create(const mString &sur, const mString &na,const mString &ot,const mString &d){
         surname=sur;
         name=na;
         otch=ot;
         dr=d;
     }
-    void create(const char* sur,const char* na,const char* ot,const char* d){
+    virtual void create(const char* sur,const char* na,const char* ot,const char* d){
         surname=sur;
         name=na;
         otch=ot;
@@ -241,69 +251,41 @@ class Tpeep{
     int getState(){
         return state;
     }
+    
 };
 class Tteacher: public Tpeep{
-    protected:
-    mString preds[5];
     public:
+    mString predm[5];
     Tteacher(){
         state=1;
-        
+        for (int i=0;i<5;i++) predm[i]=0;
     }
-    void predSet(int i, mString &vl){ preds[i]=vl;}
-    mString predGet(int i){return preds[i];}
     void print(){
         cout<<"Преподаватель"<<endl;
-        cout<<surname<<" "<<name<<" "<<otch<<" "<<dr.substr(8,9)+"."+dr.substr(5,6)+"."+dr.substr(0,3)<<endl;
-        cout<<"Предметы:";
-        for (int i=0;i<5;i++) cout<<" "<<preds[i];
+        cout<<surname<<" "<<name<<" "<<otch<<" "<<dr.substr(8,2)+"."+dr.substr(5,2)+"."+dr.substr(0,4)<<endl;
+        cout<<"Дисциплина:";
+        for (int i=0; i<5;i++) cout<<" "<<predm[i];
         cout<<endl;
     }
+    void predmSet(int i, mString &vl){predm[i]=vl;}
+    mString predmGet(int i){return predm[i];}
 };
 class Tstudent: public Tpeep{
-    protected:
-    int marks[5];
-    
     public:
+    int marks[5];
     Tstudent(){
         state=0;
         for (int i=0;i<5;i++) marks[i]=0;
     }
-    void markSet(int i, int vl){ marks[i]=vl;}
-    int markGet(int i){return marks[i];}
-    
     void print(){
         cout<<"Студент"<<endl;
         cout<<surname<<" "<<name<<" "<<otch<<" "<<dr.substr(8,2)+"."+dr.substr(5,2)+"."+dr.substr(0,4)<<endl;
-        cout<<"Оценки:";
-        for (int i=0;i<5;i++) cout<<" "<<marks[i];
+        cout<<"Оценка:";
+        for (int i=0; i<5;i++) cout<<" "<<marks[i];
         cout<<endl;
     }
-};
-class fabrika{
-    public:
-    Tpeep* create(const char* sur,const char* na,const char* ot,const char* d,int type){
-        mString sur1,na1,ot1,d1;
-        sur1=sur;
-        na1=na;
-        ot1=ot;
-        d1=d;
-        return create(sur1,na1,ot1,d1,type);
-    }
-    
-    
-    Tpeep* create(const mString &sur, const mString &na,const mString &ot,const mString &d,int type){
-        Tpeep*res = NULL;
-        if (type==0){
-            res= new Tstudent;
-            res->create(sur,na,ot,d);
-        }
-        else if (type==1){
-            res= new Tteacher;
-            res->create(sur,na,ot,d);
-        }
-        return res;
-    }
+    void markSet(int i, int vl){marks[i]=vl;}
+    int markGet(int i){return marks[i];}
 };
 class builder2{
     public:
@@ -315,17 +297,39 @@ class builder2{
             person->markSet(i,o);
         }
     }
-    void inputPreds(Tteacher* person){
+    void inputPredm(Tteacher* person){
         int i;
         mString o;
-        cout<<"Введите Предметы"<<endl;
+        cout<<"Введите дисциплину"<<endl;
         for (i=0;i<5;i++){
             cout<<"["<<i<<"]";cin>>o;
-            person->predSet(i,o);
+            person->predmSet(i,o);
         }
     }
 };
-
+class fabrika{
+    public:
+    Tpeep* create(const char* nm,const char* snm, const char* ot, const char* d, int type){
+        mString nm1,snm1,ot1,d1;
+        nm1=nm;
+        snm1=snm;
+        ot1=ot;
+        d1=d;
+        return create(nm1,snm1,ot1,d1,type);
+    }
+    Tpeep* create(mString &nm, mString &snm, mString &ot, mString &d, int type){
+        Tpeep *res=NULL;
+        if (type==0){
+            res=new Tstudent;
+            res->create(nm, snm,ot,d);
+        }
+        else if (type==1){
+            res=new Tteacher;
+            res->create(nm,snm,ot,d);
+        }
+        return res;
+    }
+};
 int main()
 {
     // cout<<"Hello World";
@@ -333,78 +337,79 @@ int main()
     
     //mString s,p,r;
     // s.test();
-    // s="dasf2344";
+    // s="a3";
     // cout<<endl;
     // cout<< s<<endl;
-    // // r="asdasdfasdf123"+s;
+    // // // r="asdasdfasdf123"+s;
     // // cout<<r<<endl;
     // // r=s+"asdasdfasdf123";
     // // cout<<r<<endl;
     // r=s.substr(1,4);
     // cout<<r;
     // s="133";
-    // p="1234";
-    // bool pr=s>p;
+    // p="a3143";
+    // bool pr=s<p;
+    // cout<<pr<<endl;
     // // int pr = s.find(p);
     
-    // s="123345";
+    //s="123345";
     // mString s1;
     // s1 = '3';
     // mString s2 ;
     // s2 = "7";
     
     // p = s.replace(s1,s2);
-    //p=s.substr(2,2);
+    //p=s.substr(1,2);
     // cout<< s1;
+    //cout<<p<<endl;
     
-    mString n,s,o,d;
-    s="Иванов";
-    n="Иван";
-    o="Иванович";
-    d="1111-22-30";
+    // mString n,s,o,d;
+    // s="Иванов";
+    // n="Иван";
+    // o="Иванович";
+    // d="2000-11-12";
     
     // Tpeep* pers = new Tteacher;
-    // pers->create(s,n,o,d);
+    // pers->create(n,s,o,d);
     // pers->print();
     // Tpeep* stud = new Tstudent;
-    // stud->create("Иванов","Иван","Иванович","1111-22-30");
+    // stud->create("Пётр","Петров","Петрович","2005-05-06");
     // stud->print();
     
     // fabrika dekanat;
+    
     // Tpeep* pers1, *pers2;
     
-    // pers1= dekanat.create(n,s,o,d,1);
-    // pers2= dekanat.create("Семионов","Семён","Иоганович","2000-10-01",0);
+    // pers1=dekanat.create(n,s,o,d,1);
+    
+    // pers2=dekanat.create("Семен", "Семионов", "Иоганович", "2000-04-01", 0);
     // pers1->print();
     // pers2->print();
     // delete pers1;delete pers2;
     
-    
-    fabrika dekanat;
-    builder2 uchOtdel;
-    int k=1,t,i;
-    mString tmp;
-    Tpeep ** peeps = new Tpeep*[k];
-    for (i=0;i<k;i++){
-        cout<<"Введите фамилию: ";cin>>s;
-        cout<<"Введите имя: ";cin>>n;
-        cout<<"Введите отчество: ";cin>>o;
-        cout<<"Введите дату рождения: ";cin>>d;
-        cout<<"Введите статус (0-студент, 1-преподаватель: ";cin>>t;
-        cin>>tmp;
-        
-        peeps[i]=dekanat.create(n,s,o,d,t);
-        if (t==0)
-        {
-            uchOtdel.inputMarks((Tstudent*)peeps[i]);
-        }
-        else{
-            uchOtdel.inputPreds((Tteacher*)peeps[i]);
-        }
-    }
-    for (i=0;i<k;i++){
-        if (peeps[i]->getState()==1)
-            peeps[i]->print();
-    }
+    // fabrika dekanat;
+    // builder2 uchOtdel;
+    // int k=1,t,i;
+    // mString tmp;
+    // Tpeep ** peeps=new Tpeep*[k];
+    // for (i=0;i<k;i++){
+    //     cout<<"Введите фамилию: " ;cin>>s;
+    //     cout<<"Введите имя: ";cin>>n;
+    //     cout<<"Введите отчество: ";cin>>o;
+    //     cout<<"Введетие дату рождения: ";cin>>d;
+    //     cout<<"Введите статус(0-судент,1-преподаватель): ";cin>>t;
+    //     cin>>tmp;
+    //     peeps[i]=dekanat.create(n,s,o,d,t);
+    //     if (t==0){
+    //         uchOtdel.inputMarks((Tstudent*)peeps[i]);
+    //     }
+    //     else if (t==1){
+    //         uchOtdel.inputPredm((Tteacher*)peeps[i]);
+    //     }
+    // }
+    // for (i=0;i<k;i++){
+    //     if (peeps[i]->getState()==0)
+    //         peeps[i]->print();
+    // }
     return 0;
 }
