@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 class Matrix
 {
 private:
@@ -25,11 +26,12 @@ public:
     void operator= (const Matrix& D);
     Matrix operator+ (const Matrix& D) const;
     Matrix operator- (const Matrix& D) const;
+    Matrix operator* (const int value) const;
+    Matrix operator* (const Matrix& D) const;
     
     friend std::ostream& operator<<(std::ostream &out, const Matrix &mtr);
     friend std::istream& operator>>(std::istream &in, Matrix &mtr);
     Matrix minor(int r,int c);
-    double det();
 };
 
 std::ostream& operator<< (std::ostream&out, const Matrix &mtr)
@@ -87,6 +89,31 @@ Matrix Matrix::operator+ (const Matrix& D) const
     }
     return A;
 }
+Matrix Matrix::operator* (const int value) const
+{
+    Matrix A(m,n);
+    for (int i=0; i<m;i++){
+        for (int j=0;j<n;j++){
+            A.data[i][j]=data[i][j]*value;
+        }
+    }
+    return A;
+}
+Matrix Matrix::operator* (const Matrix& D) const
+{
+    if (n!= D.m){
+        std::cout<<"Умножение матриц невозможно";
+        exit(1);
+    }
+    Matrix A(m,D.n);
+    for (int i=0; i<m;i++){
+        for (int j=0; j<D.n;j++){
+            for (int k=0; k<n;k++)
+                A.data[i][j]+=data[i][k]*D.data[k][j];
+        }
+    }
+    return A;
+}
 Matrix Matrix::minor(int r, int c){
     Matrix A(m-1,n-1);
     int i,j,i1,j1;
@@ -101,36 +128,69 @@ Matrix Matrix::minor(int r, int c){
         }
     return A;
 }
-double Matrix::det(){
-    if (m!=n) return 0;
-    if (m==1) return data[0][0];
-    int zn=1;
-    Matrix A;
-    double res=0;
-    for (int i=0;i<m;i++){
-        A.minor(0,i);
-        std::cout<<A;
-        res+=data[0][i]*zn*A.det();
-        zn=-zn;
+    int  findDet(int** a, int n) {
+        if (n == 1)
+            return a[0][0];
+        else if (n == 2)
+            return a[0][0] * a[1][1] - a[0][1] * a[1][0];
+        else {
+            int d = 0;
+            for (int k = 0; k < n; k++) {
+                int** b = new int*[n-1];
+                for (int i = 0; i < n - 1; i++) {
+                    b[i] = new int[n-1];
+                }
+                for (int i = 1; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        if (j == k)
+                            continue;
+                        else if (j < k)
+                            b[i-1][j] = a[i][j];
+                        else
+                            b[i-1][j-1] = a[i][j];
+                    }
+                }
+                d += pow(-1, k + 2) * a[0][k] * findDet(b, n - 1);
+            }
+            return d;
+        }
     }
-    return res;
-}
 
 int main()
 {
     Matrix mtr(3,3), mt(3,3), mr;
     std::cout <<mtr<<'\n';
-    std::cin >> mtr;
-    std::cout<<mtr<<'\n';
+    //std::cin >> mtr;
+    //std::cout<<mtr<<'\n';
     //std::cout<<mt<<'\n';
-    mt=mtr;
+    //mt=mtr;
     //std::cout<<mt<<'\n';
     //std::cout<<mr<<'\n';
     //mr=mtr+mt;
     //std::cout<<mr<<'\n';
-    //mr=mt.minor(1,1);
+    //mr=mtr.minor(1,1);
     //std::cout<<mr<<'\n';
-    double z = mt.det();
-    std::cout<<z<<std::endl;
+    int n;
+    std::cout << "Enter a matrix size:\n";
+    std::cout << "n = ";
+    std::cin >> n;
+    int** a = new int * [n];
+    for (int i = 0; i < n; i++) {
+        a[i] = new int[n];
+    }
+    std::cout << "Enter a matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            std::cin >> a[i][j];
+        }
+    }
+    std::cout << "Found determinant: " << findDet(a, n) << "\n";
+    system("pause");
+    //mr=mt*3;
+    //std::cout<<mr<<std::endl;
+    // std::cin>>mt;
+    // std::cout<<mt<<'\n';
+    // mr=mtr*mt;
+    // std::cout<<mr<<std::endl;
     return 0;
 }
