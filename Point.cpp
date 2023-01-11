@@ -95,9 +95,78 @@ class segment{
 
     
 };
+class figure{
+    private:
+    point *pi;
+    int dl;
+    public:
+    figure(){
+        pi=NULL;
+    }
+    figure(int n){
+        dl=n;
+        pi = new point[n];
+        double x,y;
+        for(int i=0;i<n;i++){
+            cin>>x;
+            cin>>y;
+            pi[i]=point(x,y);
+        }
+    }
+    ~figure(){//деструктов. обязательно разрушение используемых динамических объектов
+        delete pi;
+    }
+    void print(){
+        for(int i=0;i<dl;i++){
+            pi[i].printPoint();
+        }
+    }
+    double length(){
+        double l;
+        for(int i=0;i<dl-1;i++){
+            l+=sqrt(pow(pi[i].getX()-pi[i+1].getX(),2)+pow(pi[i].getY()-pi[i+1].getY(),2));
+        }
+        return l;
+    }
+    double Striangle(){
+        float res;
+        res=0.5*abs((pi[1].getX()-pi[0].getX())*(pi[2].getY()-pi[0].getY())-(pi[2].getX()-pi[0].getX())*(pi[1].getY()-pi[0].getY()));
+        return res;
+    }
+    double Smnog(){
+        double res=0.0;
+        for(unsigned i=0,j=1;i<dl;j=(++i+1)%dl){
+            res+=(pi[j].getX()-pi[i].getX())*(pi[j].getY()+pi[i].getY());
+        }
+        return fabs(0.5*res);
+    }
+    double Prov(){
+        int i,j,k;
+        int flag = 0;
+        double z;
+        if (dl < 3)
+            return(0);
+        for (i=0;i<dl;i++) {
+            j = (i + 1) % dl;
+            k = (i + 2) % dl;
+            z  = (pi[j].getX() - pi[i].getX()) * (pi[k].getY() - pi[j].getY());
+            z -= (pi[j].getY() - pi[i].getY()) * (pi[k].getX() - pi[j].getX());
+            if (z < 0)
+                flag |= 1;
+            else if (z > 0)
+                flag |= 2;
+            if (flag == 3)
+                return false;//Не выпуклая
+        }
+        if (flag != 0)
+            return true; //Выпуклая
+        else
+            return 0;
+    }
+};
 int main()
 {
-    point P;
+    /*point P;
     //P.printPoint();
     point P2(3,5);
     //P2.printPoint();
@@ -116,9 +185,13 @@ int main()
     cout<<endl;
     //AB->getMeedle();
     //cout<<endl;
-    cout<<AB->pointBelongs(&P2);
-    
-    
-    
+    cout<<AB->pointBelongs(&P2);*/
+    figure g;
+    figure h(4);
+    /*h.print();
+    cout<< h.length();*/
+    /*cout<<h.Striangle();*/
+    /*cout<<h.Smnog();*/
+    cout<<h.Prov();
     return 0;
 }
