@@ -64,7 +64,7 @@ class triangle : public figure{
         double AB2=x3-x1;
         double AC1=y2-y1;
         double AC2=y3-y1;
-        return 0.5*(AB1*AC2-AB2*AC1);
+        return abs(0.5*(AB1*AC2-AB2*AC1));
     }
     double lenth(){
         return 0;
